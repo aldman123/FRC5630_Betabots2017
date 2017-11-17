@@ -17,8 +17,10 @@ public class Robot extends SampleRobot {
 	RobotDrive robotDrive;
 	Compressor shooterCompressor;
 	DoubleSolenoid shooterSolenoid;
-	JoystickButton buttonA, buttonB, buttonX, buttonY, buttonBack, buttonStart;
-
+	boolean buttonA, buttonB, buttonX, buttonY, buttonBack, buttonStart;
+	boolean solenoidOn, compressorEnabled, pressureSwitch;
+	double compressorCurrent;
+	
 	// Channels for the wheels
 	final int kFrontLeftChannel = 2;
 	final int kRearLeftChannel = 3;
@@ -27,9 +29,6 @@ public class Robot extends SampleRobot {
 
 	// The channel on the driver station that the joystick is connected to
 	final int kJoystickChannel = 0;
-	
-	boolean compressorOn, solenoidOn, compressorEnabled, pressureSwitch;
-	double compressorCurrent;
 
 	Joystick stick = new Joystick(kJoystickChannel);
 
@@ -50,33 +49,46 @@ public class Robot extends SampleRobot {
 		shooterSolenoid = new DoubleSolenoid(0,1);
 	}
 
+	
+	public void getInput() {
+		
+		if (buttonA == false && stick.getRawButton(0)) {
+			toggle(solenoidOn);
+		}
+		
+		buttonA = stick.getRawButton(0);
+		buttonB = stick.getRawButton(1);
+		buttonX = stick.getRawButton(2);
+		buttonY = stick.getRawButton(3);
+		buttonBack = stick.getRawButton(6);
+		buttonStart = stick.getRawButton(7);
+		
+		solenoidOn = buttonBack;
+		
+	}
+	
+	public void toggle(boolean i) {
+		if (i) {
+			i = false;
+		} else {
+			i = true;
+		}
+	}
+	
 	/**
 	 * Runs the motors with Mecanum drive.
 	 */
 	@Override
-	
-	public void getInputs() {
-		buttonA = new JoystickButton(stick, 0);
-		buttonB = new JoystickButton(stick, 1);
-		buttonX = new JoystickButton(stick, 2);
-		buttonY = new JoystickButton(stick, 3);
-	}
-	
-	
 	public void operatorControl() {
 		robotDrive.setSafetyEnabled(true);
 		while (isOperatorControl() && isEnabled()) {
-
+			getInput();
+			
 			// Use the joystick X axis for lateral movement, Y axis for forward
 			// movement, and Z axis for rotation.
 			// This sample does not use field-oriented drive, so the gyro input
 			// is set to zero.
 			robotDrive.mecanumDrive_Cartesian(stick.getX(), stick.getY(), stick.getZ(), 0);
-			
-			
-			
-			//compressorOn = stick.getRawButton(8); //The START? Button
-			solenoidOn = stick.getRawButton(7); //The BACK Button
 			
 					
 			shooterCompressor.start();
@@ -89,7 +101,7 @@ public class Robot extends SampleRobot {
 				shooterSolenoid.set(DoubleSolenoid.Value.kReverse);
 			}
 			
-			compressorEnabled = shooterCompressor.enabled();					//Get Compressor Status
+			compressorEnabled = shooterCompressor.enabled();	//Get Compressor Status
 			pressureSwitch = shooterCompressor.getPressureSwitchValue();
 			compressorCurrent = shooterCompressor.getCompressorCurrent();
 			
