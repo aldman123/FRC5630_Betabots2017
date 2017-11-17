@@ -18,7 +18,9 @@ public class Robot extends SampleRobot {
 	Compressor shooterCompressor;
 	DoubleSolenoid shooterSolenoid;
 	boolean buttonA, buttonB, buttonX, buttonY, buttonBack, buttonStart;
-	boolean solenoidOn, compressorEnabled, pressureSwitch;
+	boolean compressorEnabled, pressureSwitch;
+	boolean toggleButtonA = false;
+	boolean solenoidOn = false;
 	double compressorCurrent;
 	
 	// Channels for the wheels
@@ -52,27 +54,25 @@ public class Robot extends SampleRobot {
 	
 	public void getInput() {
 		
-		if (buttonA == false && stick.getRawButton(0)) {
-			toggle(solenoidOn);
+		buttonA = stick.getRawButton(1); //Buttons start at 1... [sadface]
+		buttonB = stick.getRawButton(2);
+		buttonX = stick.getRawButton(3);
+		buttonY = stick.getRawButton(4);
+		buttonBack = stick.getRawButton(7);
+		buttonStart = stick.getRawButton(8);
+		
+		
+		if (toggleButtonA && buttonA) {
+			toggleButtonA = false;
+			if (solenoidOn == true) {
+				solenoidOn = false;
+			} else {
+				solenoidOn = true;
+			}
+		} else if (buttonA == false) { 
+			toggleButtonA = true;
 		}
 		
-		buttonA = stick.getRawButton(0);
-		buttonB = stick.getRawButton(1);
-		buttonX = stick.getRawButton(2);
-		buttonY = stick.getRawButton(3);
-		buttonBack = stick.getRawButton(6);
-		buttonStart = stick.getRawButton(7);
-		
-		solenoidOn = buttonBack;
-		
-	}
-	
-	public void toggle(boolean i) {
-		if (i) {
-			i = false;
-		} else {
-			i = true;
-		}
 	}
 	
 	/**
@@ -95,7 +95,7 @@ public class Robot extends SampleRobot {
 			shooterCompressor.setClosedLoopControl(true); //Always goes after shooterCompressor.start();
 			
 			
-			if (solenoidOn) {
+			if (solenoidOn || buttonBack) {
 				shooterSolenoid.set(DoubleSolenoid.Value.kForward);
 			} else {
 				shooterSolenoid.set(DoubleSolenoid.Value.kReverse);
@@ -108,6 +108,8 @@ public class Robot extends SampleRobot {
 			SmartDashboard.putBoolean("Compressor Enabled", compressorEnabled); //Displays Status of Compressor
 			SmartDashboard.putBoolean("Pressure Switch", pressureSwitch);
 			SmartDashboard.putNumber("Compressor Current", compressorCurrent);
+			SmartDashboard.putBoolean("Button A", buttonA);
+			SmartDashboard.putBoolean("toggle", toggleButtonA);
 
 			Timer.delay(0.005); // wait 5ms to avoid hogging CPU cycles
 		}
