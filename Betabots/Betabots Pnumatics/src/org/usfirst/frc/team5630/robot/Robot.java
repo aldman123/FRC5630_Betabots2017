@@ -17,6 +17,7 @@ public class Robot extends SampleRobot {
 	RobotDrive robotDrive;
 	Compressor shooterCompressor;
 	DoubleSolenoid shooterSolenoid;
+	JoystickButton buttonA, buttonB, buttonX, buttonY, buttonBack, buttonStart;
 
 	// Channels for the wheels
 	final int kFrontLeftChannel = 2;
@@ -53,6 +54,15 @@ public class Robot extends SampleRobot {
 	 * Runs the motors with Mecanum drive.
 	 */
 	@Override
+	
+	public void getInputs() {
+		buttonA = new JoystickButton(stick, 0);
+		buttonB = new JoystickButton(stick, 1);
+		buttonX = new JoystickButton(stick, 2);
+		buttonY = new JoystickButton(stick, 3);
+	}
+	
+	
 	public void operatorControl() {
 		robotDrive.setSafetyEnabled(true);
 		while (isOperatorControl() && isEnabled()) {
@@ -63,8 +73,11 @@ public class Robot extends SampleRobot {
 			// is set to zero.
 			robotDrive.mecanumDrive_Cartesian(stick.getX(), stick.getY(), stick.getZ(), 0);
 			
+			
+			
 			//compressorOn = stick.getRawButton(8); //The START? Button
 			solenoidOn = stick.getRawButton(7); //The BACK Button
+			
 					
 			shooterCompressor.start();
 			shooterCompressor.setClosedLoopControl(true); //Always goes after shooterCompressor.start();
