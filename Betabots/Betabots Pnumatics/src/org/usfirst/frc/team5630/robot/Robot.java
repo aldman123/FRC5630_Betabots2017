@@ -36,16 +36,15 @@ public class Robot extends SampleRobot {
 
 	public Robot() {
 		robotDrive = new RobotDrive(kFrontLeftChannel, kRearLeftChannel, kFrontRightChannel, kRearRightChannel);
-		robotDrive.setInvertedMotor(MotorType.kFrontLeft, true); // invert the
+		//robotDrive.setInvertedMotor(MotorType.kFrontLeft, true); // invert the
 																	// left side
 																	// motors
-		robotDrive.setInvertedMotor(MotorType.kRearLeft, true); // you may need
+		//robotDrive.setInvertedMotor(MotorType.kRearLeft, true); // you may need
 																// to change or
 																// remove this
 																// to match your
 																// robot
 		robotDrive.setExpiration(0.1);
-		
 		
 		shooterCompressor = new Compressor();
 		shooterSolenoid = new DoubleSolenoid(0,1);
@@ -75,20 +74,15 @@ public class Robot extends SampleRobot {
 		
 	}
 	
-	/**
-	 * Runs the motors with Mecanum drive.
-	 */
 	@Override
 	public void operatorControl() {
 		robotDrive.setSafetyEnabled(true);
 		while (isOperatorControl() && isEnabled()) {
 			getInput();
 			
-			// Use the joystick X axis for lateral movement, Y axis for forward
-			// movement, and Z axis for rotation.
-			// This sample does not use field-oriented drive, so the gyro input
-			// is set to zero.
-			robotDrive.mecanumDrive_Cartesian(stick.getX(), stick.getY(), stick.getZ(), 0);
+			//Standard Right Joystick Forward/Backward
+			//Left Joystick Right/Left
+			robotDrive.arcadeDrive(stick);
 			
 					
 			shooterCompressor.start();
